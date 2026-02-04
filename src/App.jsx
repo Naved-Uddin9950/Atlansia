@@ -47,13 +47,10 @@ const Header = () => {
     <header className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-emerald-300/80">God Simulator</p>
-        <h1 className="text-2xl font-semibold text-white">Divine Sandbox</h1>
+        <h1 className="text-2xl font-semibold text-white">Atlansia</h1>
       </div>
       <div className="flex items-center gap-4 text-xs text-slate-400">
-        <span>Frontend-only • Persisted locally</span>
-        <span className="text-slate-300">Ticks: {settings._tickCount ?? 0}</span>
-        <span className="text-slate-300">Toggles: {settings._toggleCount ?? 0}</span>
-        <span className="text-slate-300">Speed: {settings.speed}</span>
+        <span className="text-slate-300">Speed: X{settings.speed}</span>
       </div>
     </header>
   );

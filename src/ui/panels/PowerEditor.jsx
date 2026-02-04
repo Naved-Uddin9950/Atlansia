@@ -30,15 +30,23 @@ const PowerEditor = () => {
       <div className="space-y-2">
         <p className="text-xs uppercase tracking-widest text-slate-400">Spawn</p>
         {races.map((race) => (
-          <button
-            key={race.id}
-            type="button"
-            onClick={() => actions.spawnCreature(race.id)}
-            className="flex w-full items-center justify-between rounded-lg border border-slate-800 bg-slate-900/40 px-2 py-2 text-xs text-slate-200"
-          >
-            <span>{race.name}</span>
-            <span className="text-emerald-200">+1</span>
-          </button>
+          <div key={race.id} className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => actions.spawnCreature(race.id)}
+              className="flex-1 items-center justify-between rounded-lg border border-slate-800 bg-slate-900/40 px-2 py-2 text-xs text-slate-200"
+            >
+              <span>{race.name}</span>
+              <span className="text-emerald-200">+1</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => actions.spawnMany(race.id, 5)}
+              className="w-16 rounded-lg border border-slate-800 bg-slate-900/40 px-2 py-2 text-xs text-slate-200"
+            >
+              x5
+            </button>
+          </div>
         ))}
       </div>
     </section>
