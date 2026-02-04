@@ -1,0 +1,7 @@
+body {
+	font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+.glow-panel {
+	box-shadow: 0 0 30px rgba(45, 212, 191, 0.15);
+}
