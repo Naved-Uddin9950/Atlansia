@@ -46,6 +46,27 @@ const PowerEditor = () => {
             >
               x5
             </button>
+            <button
+              type="button"
+              onClick={() => actions.killRace(race.id)}
+              className="w-16 rounded-lg border border-rose-600 bg-rose-900/10 px-2 py-2 text-xs text-rose-200"
+            >
+              Kill
+            </button>
+            <button
+              type="button"
+              onClick={() => actions.blessRace(race.id)}
+              className="w-16 rounded-lg border border-emerald-600 bg-emerald-900/10 px-2 py-2 text-xs text-emerald-200"
+            >
+              Bless
+            </button>
+            <button
+              type="button"
+              onClick={() => actions.curseRace(race.id)}
+              className="w-16 rounded-lg border border-amber-600 bg-amber-900/10 px-2 py-2 text-xs text-amber-200"
+            >
+              Curse
+            </button>
           </div>
         ))}
       </div>

@@ -89,6 +89,12 @@ export const GameProvider = ({ children }) => {
       createRace: (race) => dispatch({ type: "CREATE_RACE", payload: race }),
       updateRace: (race) => dispatch({ type: "UPDATE_RACE", payload: race }),
       spawnCreature: (raceId) => dispatch({ type: "SPAWN_RANDOM", payload: raceId }),
+      killCreature: (id) => dispatch({ type: "KILL_CREATURE", payload: id }),
+      killRace: (raceId) => dispatch({ type: "KILL_RACE", payload: raceId }),
+      blessCreature: (id) => dispatch({ type: "APPLY_EFFECT", payload: { scope: "creature", id, effect: { health: 30, energy: 20, faith: 10 } } }),
+      curseCreature: (id) => dispatch({ type: "APPLY_EFFECT", payload: { scope: "creature", id, effect: { health: -30, energy: -15 } } }),
+      blessRace: (raceId) => dispatch({ type: "APPLY_EFFECT", payload: { scope: "race", id: raceId, effect: { health: 20, energy: 15, faith: 10 } } }),
+      curseRace: (raceId) => dispatch({ type: "APPLY_EFFECT", payload: { scope: "race", id: raceId, effect: { health: -25, energy: -10 } } }),
       triggerDisaster: (type) => dispatch({ type: "TRIGGER_DISASTER", payload: type }),
       updateRule: (payload) => dispatch({ type: "UPDATE_RULE", payload }),
       resetWorld: () => {

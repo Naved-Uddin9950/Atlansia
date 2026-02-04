@@ -57,6 +57,29 @@ const CreaturePanel = () => {
             <span>Hunger: {Math.round(selected.stats.hunger)}</span>
             <span>Faith: {Math.round(selected.stats.faith)}</span>
           </div>
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => actions.killCreature(selected.id)}
+                  className="flex-1 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-rose-200"
+                >
+                  Kill
+                </button>
+                <button
+                  type="button"
+                  onClick={() => actions.blessCreature(selected.id)}
+                  className="flex-1 rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-emerald-200"
+                >
+                  Bless
+                </button>
+                <button
+                  type="button"
+                  onClick={() => actions.curseCreature(selected.id)}
+                  className="flex-1 rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-amber-200"
+                >
+                  Curse
+                </button>
+              </div>
         </div>
       ) : (
         <p className="text-xs text-slate-500">Select a creature to inspect its soul.</p>
