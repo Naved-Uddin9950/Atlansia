@@ -3,7 +3,7 @@ import { createTile } from "../engine/worldEngine.js";
 
 export const createWorld = ({
   id = uuid(),
-  name = "Genesis",
+  name = "Atlansia",
   width = 24,
   height = 18,
   rules,

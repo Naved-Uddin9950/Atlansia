@@ -93,7 +93,20 @@ export const GameProvider = ({ children }) => {
       updateRule: (payload) => dispatch({ type: "UPDATE_RULE", payload }),
       resetWorld: () => {
         const world = regenerateWorld(state.world);
-        dispatch({ type: "RESET_WORLD", payload: { world, creatures: [] } });
+        // Repopulate creatures using defaultCreatures mapping and current races
+        const raceMapByName = new Map(state.races.map((r) => [r.name, r.id]));
+        const creatures = defaultCreatures.flatMap((entry) => {
+          const raceId = raceMapByName.get(entry.raceName) ?? state.races[0]?.id;
+          return Array.from({ length: entry.count }, () =>
+            createCreature({ raceId, position: findRandomSpawn(world) })
+          );
+        });
+        dispatch({ type: "RESET_WORLD", payload: { world, creatures } });
+      },
+      spawnMany: (raceId, count = 5) => {
+        for (let i = 0; i < count; i++) {
+          dispatch({ type: "SPAWN_RANDOM", payload: raceId });
+        }
       },
       resetSave: async () => {
         await persistence.resetGameState();
