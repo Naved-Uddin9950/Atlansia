@@ -62,6 +62,53 @@ export const gameReducer = (state, action) => {
       };
     case "TRIGGER_DISASTER":
       return applyDisaster(state, action.payload);
+    case "KILL_CREATURE": {
+      const id = action.payload;
+      return {
+        ...state,
+        creatures: state.creatures.map((c) => (c.id === id ? { ...c, alive: false, stats: { ...c.stats, health: 0 } } : c)),
+      };
+    }
+    case "KILL_RACE": {
+      const raceId = action.payload;
+      return {
+        ...state,
+        creatures: state.creatures.map((c) => (c.raceId === raceId ? { ...c, alive: false, stats: { ...c.stats, health: 0 } } : c)),
+      };
+    }
+    case "APPLY_EFFECT": {
+      const { scope, id, effect } = action.payload || {};
+      if (scope === "creature") {
+        return {
+          ...state,
+          creatures: state.creatures.map((c) => {
+            if (c.id !== id) return c;
+            const stats = { ...c.stats };
+            Object.entries(effect || {}).forEach(([k, v]) => {
+              if (typeof stats[k] === "number") stats[k] = Math.max(0, Math.min(100, stats[k] + v));
+            });
+            return { ...c, stats };
+          }),
+        };
+      }
+
+      if (scope === "race") {
+        const raceId = id;
+        return {
+          ...state,
+          creatures: state.creatures.map((c) => {
+            if (c.raceId !== raceId) return c;
+            const stats = { ...c.stats };
+            Object.entries(effect || {}).forEach(([k, v]) => {
+              if (typeof stats[k] === "number") stats[k] = Math.max(0, Math.min(100, stats[k] + v));
+            });
+            return { ...c, stats };
+          }),
+        };
+      }
+
+      return state;
+    }
     case "RESET_WORLD":
       return { ...state, world: action.payload.world, creatures: action.payload.creatures };
     case "TICK": {
