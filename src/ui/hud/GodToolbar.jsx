@@ -1,11 +1,13 @@
 import React from "react";
 import { useWorld } from "../../game/hooks/useWorld.js";
+import { useNavigate } from "react-router-dom";
 
 const GodToolbar = () => {
   const {
     state: { powers, ui },
     actions,
   } = useWorld();
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-3">
@@ -23,7 +25,11 @@ const GodToolbar = () => {
       <div className="ml-auto flex items-center gap-2">
         <button
           type="button"
-          onClick={() => actions.enterWorld(!ui.playerMode)}
+          onClick={() => {
+            actions.enterWorld(!ui.playerMode);
+            if (!ui.playerMode) navigate("/world");
+            else navigate("/");
+          }}
           className={`rounded-xl border px-3 py-2 text-xs font-semibold uppercase ${
             ui.playerMode ? "border-emerald-400 bg-emerald-600/10 text-emerald-200" : "border-slate-700 text-slate-200"
           }`}

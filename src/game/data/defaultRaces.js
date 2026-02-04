@@ -1,20 +1,24 @@
+import humans from "../../assets/races/humans.png";
+import atlasians from "../../assets/races/atlasians.png";
+import demons from "../../assets/races/demons.png";
+
 export const defaultRaces = [
   {
-    name: "Aetherians",
-    icon: "https://images.unsplash.com/photo-1520975922320-3f6f1a10a6f9?auto=format&fit=crop&w=64&h=64&q=60",
+    name: "Atlasians",
+    icon: atlasians,
     traits: {
-      strength: 45,
-      intelligence: 70,
-      lifespan: 130,
-      fertility: 55,
-      aggression: 35,
-      adaptability: 65,
+      strength: 900,
+      intelligence: 450,
+      lifespan: 3000,
+      fertility: 4,
+      aggression: 2,
+      adaptability: 84,
     },
     passiveAbilities: ["Starlight Memory", "Dream Weaving"],
   },
   {
-    name: "Stonekin",
-    icon: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=64&h=64&q=60",
+    name: "Humans",
+    icon: humans,
     traits: {
       strength: 80,
       intelligence: 40,
@@ -26,16 +30,16 @@ export const defaultRaces = [
     passiveAbilities: ["Granite Hide", "Enduring Will"],
   },
   {
-    name: "Verdants",
-    icon: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=64&h=64&q=60",
+    name: "Demons",
+    icon: demons,
     traits: {
-      strength: 35,
-      intelligence: 55,
-      lifespan: 120,
-      fertility: 80,
-      aggression: 25,
-      adaptability: 70,
+      strength: 520,
+      intelligence: 220,
+      lifespan: 980,
+      fertility: 12,
+      aggression: 72,
+      adaptability: 62,
     },
-    passiveAbilities: ["Photosynthesis", "Rooted Communion"],
+    passiveAbilities: ["Hellfire Affinity", "Corrupting Presence"],
   },
 ];

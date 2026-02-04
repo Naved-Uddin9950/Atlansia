@@ -62,6 +62,16 @@ export const gameReducer = (state, action) => {
       };
     case "TRIGGER_DISASTER":
       return applyDisaster(state, action.payload);
+    case "ADD_ACTIVE_EFFECT": {
+      const { targetType, targetId, effect, expiresAt } = action.payload || {};
+      const active = state.ui?.activeEffects ?? [];
+      return { ...state, ui: { ...state.ui, activeEffects: active.concat({ targetType, targetId, effect, expiresAt }) } };
+    }
+    case "REMOVE_ACTIVE_EFFECT": {
+      const { targetId } = action.payload || {};
+      const active = (state.ui?.activeEffects ?? []).filter((e) => e.targetId !== targetId);
+      return { ...state, ui: { ...state.ui, activeEffects: active } };
+    }
     case "SHOW_NOTIFICATION":
       return { ...state, ui: { ...state.ui, notification: action.payload } };
     case "CLEAR_NOTIFICATION":
@@ -125,7 +135,7 @@ export const gameReducer = (state, action) => {
     case "TICK": {
       const raceMap = new Map(state.races.map((race) => [race.id, race]));
       const world = applyWorldRules(applyWorldAging(state.world));
-      const moved = stepCreaturesAI(world, state.creatures, raceMap);
+      const moved = stepCreaturesAI(world, state.creatures, raceMap, state.ui?.playerPosition);
       const withCombat = resolveCombat(moved, raceMap);
       const withBirths = handleBirths(world, withCombat, raceMap);
       const withDeaths = handleDeaths(withBirths, raceMap);
