@@ -1,13 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { useWorld } from "../../game/hooks/useWorld.js";
 import { createRace } from "../../game/models/Race.js";
+import humanImg from "../../assets/races/humans.png";
+import demonImg from "../../assets/races/demons.png";
+import atlasiansImg from "../../assets/races/atlasians.png";
 
-const ICONS = [
-  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=64&h=64&q=60",
-  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=64&h=64&q=60",
-  "https://images.unsplash.com/photo-1520975922320-3f6f1a10a6f9?auto=format&fit=crop&w=64&h=64&q=60",
-  "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=64&h=64&q=60",
-];
+const ICONS = [humanImg, demonImg, atlasiansImg];
 
 const RaceEditor = () => {
   const {
@@ -16,6 +14,7 @@ const RaceEditor = () => {
   } = useWorld();
   const selectedRace = races.find((race) => race.id === ui.selectedRaceId) ?? races[0];
   const [draft, setDraft] = useState({ name: "", strength: 50, intelligence: 50, lifespan: 100, fertility: 50, aggression: 40, adaptability: 50 });
+  const [selectedIcon, setSelectedIcon] = useState(ICONS[0]);
 
   const traitList = useMemo(
     () =>
@@ -28,7 +27,7 @@ const RaceEditor = () => {
   const handleCreate = () => {
     const race = createRace({
       name: draft.name || `Race ${races.length + 1}`,
-      icon: ICONS[Math.floor(Math.random() * ICONS.length)],
+      icon: selectedIcon,
       traits: {
         strength: draft.strength,
         intelligence: draft.intelligence,
@@ -98,6 +97,21 @@ const RaceEditor = () => {
           placeholder="Race name"
           className="w-full rounded-lg border border-slate-800 bg-slate-950/80 px-2 py-1 text-xs text-slate-200"
         />
+        <div className="mt-2">
+          <p className="text-xs text-slate-400">Choose Icon</p>
+          <div className="mt-1 flex gap-2">
+            {ICONS.map((ic) => (
+              <button
+                key={ic}
+                type="button"
+                onClick={() => setSelectedIcon(ic)}
+                className={`rounded-lg border p-1 ${selectedIcon === ic ? "border-purple-400" : "border-slate-800"}`}
+              >
+                <img src={ic} alt="icon" className="h-8 w-8 rounded-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
         <button
           type="button"
           onClick={handleCreate}
@@ -105,6 +119,24 @@ const RaceEditor = () => {
         >
           Manifest Race
         </button>
+      </div>
+      <div className="mt-3">
+        <p className="text-xs text-slate-400">Change Selected Race Icon</p>
+        <div className="mt-1 flex gap-2">
+          {ICONS.map((ic) => (
+            <button
+              key={`chg-${ic}`}
+              type="button"
+              onClick={() => {
+                if (!selectedRace) return;
+                actions.updateRace({ ...selectedRace, icon: ic });
+              }}
+              className="rounded-lg border border-slate-800 p-1"
+            >
+              <img src={ic} alt="icon" className="h-8 w-8 rounded-full object-cover" />
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );
