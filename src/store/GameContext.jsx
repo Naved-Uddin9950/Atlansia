@@ -1,0 +1,111 @@
+import React, { createContext, useEffect, useMemo, useReducer, useState } from "react";
+import { gameReducer } from "./reducers.js";
+import { createWorld } from "../game/models/World.js";
+import { createRace } from "../game/models/Race.js";
+import { createCreature } from "../game/models/Creature.js";
+import { defaultRaces } from "../game/data/defaultRaces.js";
+import { defaultCreatures } from "../game/data/defaultCreatures.js";
+import { defaultWorldRules } from "../game/data/defaultWorldRules.js";
+import { findRandomSpawn, regenerateWorld } from "../game/engine/worldEngine.js";
+import { useGameLoop } from "../game/hooks/useGameLoop.js";
+import { usePersistence } from "../game/hooks/usePersistence.js";
+
+export const GameContext = createContext(null);
+
+const createInitialState = () => {
+  const races = defaultRaces.map((race) => createRace(race));
+  const world = createWorld({ rules: { ...defaultWorldRules } });
+  const raceMap = new Map(races.map((race) => [race.name, race.id]));
+
+  const creatures = defaultCreatures.flatMap((entry) => {
+    const raceId = raceMap.get(entry.raceName) ?? races[0]?.id;
+    return Array.from({ length: entry.count }, () =>
+      createCreature({ raceId, position: findRandomSpawn(world) })
+    );
+  });
+
+  return {
+    world,
+    creatures,
+    races,
+    powers: [
+      { id: "meteor", name: "Meteor" },
+      { id: "plague", name: "Plague" },
+      { id: "flood", name: "Flood" },
+    ],
+    settings: {
+      speed: 1,
+      _lastToggle: 0,
+      _tickCount: 0,
+      _toggleCount: 0,
+    },
+    ui: {
+      selectedCreatureId: null,
+      selectedRaceId: races[0]?.id ?? null,
+    },
+  };
+};
+
+export const GameProvider = ({ children }) => {
+  const persistence = usePersistence();
+  const [hydrated, setHydrated] = useState(false);
+  const [state, dispatch] = useReducer(gameReducer, null, createInitialState);
+
+  useEffect(() => {
+    let active = true;
+    const hydrate = async () => {
+      const loaded = await persistence.loadGameState();
+      if (!active) return;
+      if (loaded) {
+        dispatch({ type: "LOAD_STATE", payload: loaded });
+      }
+      setHydrated(true);
+    };
+    hydrate();
+    return () => {
+      active = false;
+    };
+  }, [persistence]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    persistence.saveGameState(state);
+  }, [hydrated, state, persistence]);
+
+  useGameLoop({
+    speed: state.settings.speed,
+    onTick: () => {
+      console.debug('[GameProvider] dispatch TICK');
+      dispatch({ type: "TICK" });
+    },
+  });
+
+  const actions = useMemo(
+    () => ({
+      setSpeed: (speed) => dispatch({ type: "SET_SPEED", payload: speed }),
+      togglePause: () => dispatch({ type: "TOGGLE_PAUSE", payload: Date.now() }),
+      selectCreature: (id) => dispatch({ type: "SELECT_CREATURE", payload: id }),
+      selectRace: (id) => dispatch({ type: "SELECT_RACE", payload: id }),
+      createRace: (race) => dispatch({ type: "CREATE_RACE", payload: race }),
+      updateRace: (race) => dispatch({ type: "UPDATE_RACE", payload: race }),
+      spawnCreature: (raceId) => dispatch({ type: "SPAWN_RANDOM", payload: raceId }),
+      triggerDisaster: (type) => dispatch({ type: "TRIGGER_DISASTER", payload: type }),
+      updateRule: (payload) => dispatch({ type: "UPDATE_RULE", payload }),
+      resetWorld: () => {
+        const world = regenerateWorld(state.world);
+        dispatch({ type: "RESET_WORLD", payload: { world, creatures: [] } });
+      },
+      resetSave: async () => {
+        await persistence.resetGameState();
+        dispatch({ type: "LOAD_STATE", payload: createInitialState() });
+      },
+    }),
+    [persistence, state.settings, state.world]
+  );
+
+  return (
+    <GameContext.Provider value={{ state, dispatch, actions }}>
+      {children}
+    </GameContext.Provider>
+  );
+};
