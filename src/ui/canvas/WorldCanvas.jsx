@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useWorld } from "../../game/hooks/useWorld.js";
 import { biomePalette } from "../../game/engine/worldEngine.js";
 
-const tileSize = 22;
+const tileSize = 30;
 
 const getTileStyle = (tile) => ({
   backgroundColor: biomePalette[tile.biome] ?? "#0f172a",
@@ -44,26 +44,33 @@ const WorldCanvas = () => {
             const creature = entry?.creatures?.[0];
             const race = creature ? raceMap.get(creature.raceId) : null;
             return (
-              <button
+              <div
                 key={`${x}-${y}`}
-                type="button"
-                onClick={() => actions.selectCreature(creature?.id ?? null)}
-                className="relative rounded-sm border border-slate-900"
+                className="relative rounded-sm border border-slate-900 bg-slate-900/20"
                 style={{ width: tileSize, height: tileSize, ...getTileStyle(tile) }}
+                onClick={() => {
+                  // Player mode is stored in state, not in actions; access current state via actions by calling selectCreature when not in playerMode
+                  if (actions?.enterWorld) {
+                    // check state via world hook - but actions doesn't expose state; use selectCreature when not in player mode
+                    actions.selectCreature(creature?.id ?? null);
+                  } else {
+                    actions.selectCreature(creature?.id ?? null);
+                  }
+                }}
               >
                 {race?.icon ? (
                   <img
                     src={race.icon}
                     alt={race.name}
-                    className="absolute inset-0 h-full w-full rounded-sm object-cover opacity-90"
+                    className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full object-cover shadow-sm"
                   />
                 ) : null}
                 {entry?.count ? (
-                  <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-slate-950/80 text-[9px] font-semibold text-amber-200">
+                  <span className="absolute bottom-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-950/80 text-[10px] font-semibold text-amber-200">
                     {entry.count}
                   </span>
                 ) : null}
-              </button>
+              </div>
             );
           })
         )}

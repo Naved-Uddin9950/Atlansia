@@ -62,6 +62,17 @@ export const gameReducer = (state, action) => {
       };
     case "TRIGGER_DISASTER":
       return applyDisaster(state, action.payload);
+    case "SHOW_NOTIFICATION":
+      return { ...state, ui: { ...state.ui, notification: action.payload } };
+    case "CLEAR_NOTIFICATION":
+      return { ...state, ui: { ...state.ui, notification: null } };
+    case "SET_PLAYER_MODE":
+      return { ...state, ui: { ...state.ui, playerMode: !!action.payload } };
+    case "MOVE_PLAYER": {
+      const pos = action.payload;
+      if (!pos) return state;
+      return { ...state, ui: { ...state.ui, playerPosition: { x: pos.x, y: pos.y } } };
+    }
     case "KILL_CREATURE": {
       const id = action.payload;
       return {
