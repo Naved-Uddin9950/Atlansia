@@ -3,7 +3,7 @@ import { useWorld } from "../../game/hooks/useWorld.js";
 
 const GodToolbar = () => {
   const {
-    state: { powers },
+    state: { powers, ui },
     actions,
   } = useWorld();
 
@@ -20,6 +20,49 @@ const GodToolbar = () => {
           {power.name}
         </button>
       ))}
+      <div className="ml-auto flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => actions.enterWorld(!ui.playerMode)}
+          className={`rounded-xl border px-3 py-2 text-xs font-semibold uppercase ${
+            ui.playerMode ? "border-emerald-400 bg-emerald-600/10 text-emerald-200" : "border-slate-700 text-slate-200"
+          }`}
+        >
+          {ui.playerMode ? "Exit World" : "Enter World"}
+        </button>
+        {ui.playerMode ? (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => actions.movePlayer({ x: Math.max(0, ui.playerPosition.x - 1), y: ui.playerPosition.y })}
+              className="rounded border px-2 py-1 text-xs"
+            >
+              ◀
+            </button>
+            <button
+              type="button"
+              onClick={() => actions.movePlayer({ x: Math.min(999, ui.playerPosition.x + 1), y: ui.playerPosition.y })}
+              className="rounded border px-2 py-1 text-xs"
+            >
+              ▶
+            </button>
+            <button
+              type="button"
+              onClick={() => actions.movePlayer({ x: ui.playerPosition.x, y: Math.max(0, ui.playerPosition.y - 1) })}
+              className="rounded border px-2 py-1 text-xs"
+            >
+              ▲
+            </button>
+            <button
+              type="button"
+              onClick={() => actions.movePlayer({ x: ui.playerPosition.x, y: Math.min(999, ui.playerPosition.y + 1) })}
+              className="rounded border px-2 py-1 text-xs"
+            >
+              ▼
+            </button>
+          </div>
+        ) : null}
+      </div>
       <button
         type="button"
         onClick={actions.resetSave}

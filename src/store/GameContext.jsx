@@ -42,6 +42,9 @@ const createInitialState = () => {
     ui: {
       selectedCreatureId: null,
       selectedRaceId: races[0]?.id ?? null,
+      playerMode: false,
+      playerPosition: { x: Math.floor(world.width / 2), y: Math.floor(world.height / 2) },
+      notification: null,
     },
   };
 };
@@ -95,7 +98,13 @@ export const GameProvider = ({ children }) => {
       curseCreature: (id) => dispatch({ type: "APPLY_EFFECT", payload: { scope: "creature", id, effect: { health: -30, energy: -15 } } }),
       blessRace: (raceId) => dispatch({ type: "APPLY_EFFECT", payload: { scope: "race", id: raceId, effect: { health: 20, energy: 15, faith: 10 } } }),
       curseRace: (raceId) => dispatch({ type: "APPLY_EFFECT", payload: { scope: "race", id: raceId, effect: { health: -25, energy: -10 } } }),
-      triggerDisaster: (type) => dispatch({ type: "TRIGGER_DISASTER", payload: type }),
+      triggerDisaster: (type) => {
+        dispatch({ type: "TRIGGER_DISASTER", payload: type });
+        dispatch({ type: "SHOW_NOTIFICATION", payload: `Triggered ${type}` });
+        setTimeout(() => dispatch({ type: "CLEAR_NOTIFICATION" }), 2200);
+      },
+      enterWorld: (enable) => dispatch({ type: "SET_PLAYER_MODE", payload: enable }),
+      movePlayer: (pos) => dispatch({ type: "MOVE_PLAYER", payload: pos }),
       updateRule: (payload) => dispatch({ type: "UPDATE_RULE", payload }),
       resetWorld: () => {
         const world = regenerateWorld(state.world);
