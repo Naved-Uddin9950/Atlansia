@@ -127,6 +127,23 @@ export const GameProvider = ({ children }) => {
         await persistence.resetGameState();
         dispatch({ type: "LOAD_STATE", payload: createInitialState() });
       },
+      applyEffectTimed: (scope, id, effect, durationMs = 5000) => {
+        try {
+          const instanceId = `eff-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+          // apply immediately
+          dispatch({ type: "APPLY_EFFECT", payload: { scope, id, effect } });
+          // register active effect for UI
+          dispatch({ type: "ADD_ACTIVE_EFFECT", payload: { targetType: scope, targetId: instanceId, effect, expiresAt: Date.now() + durationMs } });
+          // schedule revert
+          const inverse = Object.fromEntries(Object.entries(effect || {}).map(([k, v]) => [k, typeof v === 'number' ? -v : v]));
+          setTimeout(() => {
+            dispatch({ type: "APPLY_EFFECT", payload: { scope, id, effect: inverse } });
+            dispatch({ type: "REMOVE_ACTIVE_EFFECT", payload: { targetId: instanceId } });
+          }, durationMs);
+        } catch (e) {
+          console.error('applyEffectTimed error', e);
+        }
+      },
     }),
     [persistence, state.settings, state.world]
   );

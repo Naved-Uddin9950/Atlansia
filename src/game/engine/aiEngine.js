@@ -13,34 +13,58 @@ const getNeighbors = (world, { x, y }) => {
     .filter((pos) => pos.x >= 0 && pos.y >= 0 && pos.x < world.width && pos.y < world.height);
 };
 
-export const stepCreaturesAI = (world, creatures, raceMap) => {
-  return creatures.map((creature) => {
-    if (!creature.alive) return creature;
+export const stepCreaturesAI = (world, creatures, raceMap, playerPos) => {
+  // prevent stacking: process creatures sequentially and keep an occupied set
+  const occupied = new Set();
+  // initialize occupied with current alive positions
+  creatures.forEach((c) => {
+    if (!c.alive) return;
+    occupied.add(`${c.position.x},${c.position.y}`);
+  });
+
+  const results = [];
+
+  for (const creature of creatures) {
+    if (!creature.alive) {
+      results.push(creature);
+      continue;
+    }
+
+    // free current position so creature can move out
+    occupied.delete(`${creature.position.x},${creature.position.y}`);
 
     const race = raceMap.get(creature.raceId);
     const tile = world.tiles[creature.position.y][creature.position.x];
     const neighbors = getNeighbors(world, creature.position);
-    const best = neighbors.reduce(
-      (bestTile, pos) => {
+
+    // compute scored candidates but prefer unoccupied tiles and avoid player tile
+    const scored = neighbors
+      .map((pos) => {
         const candidate = world.tiles[pos.y][pos.x];
         const score = candidate.fertility - candidate.dangerLevel + randInt(-2, 2) * 0.01;
-        if (!bestTile || score > bestTile.score) {
-          return { pos, score };
-        }
-        return bestTile;
-      },
-      null
-    );
+        const key = `${pos.x},${pos.y}`;
+        const occupiedScore = occupied.has(key) ? -9999 : 0;
+        const playerKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
+        const playerPenalty = playerKey === key ? -9999 : 0;
+        return { pos, score: score + occupiedScore + playerPenalty };
+      })
+      .sort((a, b) => b.score - a.score);
 
-    const nextPosition = best?.pos ?? creature.position;
-    // Smaller per-tick changes for smoother simulation
+    const chosen = scored.length ? scored[0].pos : creature.position;
+
+    // if chosen is occupied (all neighbors occupied) then stay
+    const chosenKey = `${chosen.x},${chosen.y}`;
+    const nextPosition = occupied.has(chosenKey) ? creature.position : chosen;
+
+    // mark chosen as occupied
+    occupied.add(`${nextPosition.x},${nextPosition.y}`);
+
     const hunger = clamp(creature.stats.hunger + 0.9 - tile.fertility * 1.2, 0, 100);
     const energy = clamp(creature.stats.energy + tile.fertility * 0.6 - 0.8, 0, 100);
     const faith = clamp(creature.stats.faith + (tile.fertility - tile.dangerLevel) * 0.25, 0, 100);
-
     const healthPenalty = hunger > 90 || tile.dangerLevel > 0.9 ? 1 : 0;
 
-    return {
+    results.push({
       ...creature,
       position: nextPosition,
       age: creature.age + 1,
@@ -51,8 +75,10 @@ export const stepCreaturesAI = (world, creatures, raceMap) => {
         faith,
         health: clamp(creature.stats.health - healthPenalty + (race?.traits?.adaptability ?? 50) * 0.0015, 0, 100),
       },
-    };
-  });
+    });
+  }
+
+  return results;
 };
 
 export const shouldSeekMate = (creature, race) => {

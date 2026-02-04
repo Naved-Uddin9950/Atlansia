@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import { Routes, Route } from "react-router-dom";
 import { GameProvider } from "./store/GameContext.jsx";
 import { useWorld } from "./game/hooks/useWorld.js";
 import WorldPanel from "./ui/panels/WorldPanel.jsx";
@@ -9,30 +10,39 @@ import PowerEditor from "./ui/panels/PowerEditor.jsx";
 import WorldCanvas from "./ui/canvas/WorldCanvas.jsx";
 import GodToolbar from "./ui/hud/GodToolbar.jsx";
 import TimeControls from "./ui/hud/TimeControls.jsx";
+import WorldView from "./ui/world/WorldView.jsx";
 
 const App = () => (
   <GameProvider>
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <Header />
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <div className="min-h-screen bg-slate-950 text-slate-100">
+            <Header />
 
-      <main className="grid gap-4 px-6 py-6 lg:grid-cols-[280px_1fr_320px]">
-        <aside className="space-y-4">
-          <WorldPanel />
-          <TimeControls />
-        </aside>
+            <main className="grid gap-4 px-6 py-6 lg:grid-cols-[280px_1fr_320px]">
+              <aside className="space-y-4">
+                <WorldPanel />
+                <TimeControls />
+              </aside>
 
-        <section className="space-y-4">
-          <WorldCanvas />
-          <GodToolbar />
-        </section>
+              <section className="space-y-4">
+                <WorldCanvas />
+                <GodToolbar />
+              </section>
 
-        <aside className="space-y-4">
-          <CreaturePanel />
-          <RaceEditor />
-          <PowerEditor />
-        </aside>
-      </main>
-    </div>
+              <aside className="space-y-4">
+                <CreaturePanel />
+                <RaceEditor />
+                <PowerEditor />
+              </aside>
+            </main>
+          </div>
+        }
+      />
+      <Route path="/world" element={<WorldView />} />
+    </Routes>
   </GameProvider>
 );
 
